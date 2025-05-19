@@ -1,11 +1,69 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Meu App Django</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FyDataStart{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 </head>
-<body>
-    <h1>Olá, Mundo!</h1>
-    <p>Bem-vindo ao meu app Django!</p>
+<body id="theme-body" class="bg-light text-dark">
+    <div class="d-flex">
+        <nav id="theme-body" class="bg-primary" style="width: 190px; min-height: 100vh;">
+            <div class="p-3">
+                     <p class="text-center">FyDataStart</p>
+                <div class="d-flex justify-content-between align-items-center">
+                     <h4 class="text-dark">Menu</h4>
+                     <button id="theme-toggle" class="btn btn-sm border-0">
+                        ☀️ 
+                    </button>
+                </div>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-dark text-decoration-none d-block py-1">Início</a></li>
+                    <li><a href="#" class="text-dark text-decoration-none d-block py-1">Sobre</a></li>
+                    <li><a href="#" class="text-dark text-decoration-none d-block py-1">Serviços</a></li>
+                    <li><a href="#" class="text-dark text-decoration-none d-block py-1">Contato</a></li>
+                    <li><a href="#" class="text-dark text-decoration-none d-block py-1">Início</a></li>
+                    <li><a href="#" class="text-dark text-decoration-none d-block py-1">Sobre</a></li>
+                    <li><a href="#" class="text-dark text-decoration-none d-block py-1">Serviços</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="flex-grow-1 p-4">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+      
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    {% block extra_scripts %}
+    <script>
+    const toggleButton = document.getElementById('theme-toggle');
+    const body = document.getElementById('theme-body');
+
+    if (localStorage.getItem('theme') === 'dark') {
+        body.classList.remove('bg-light', 'text-dark');
+        body.div.nav.classList.remove('bg-primary');
+        body.div.nav.classList.add('bg-dark', 'text-light');
+        toggleButton.textContent = '🌙';
+    }
+
+    toggleButton.addEventListener('click', function () {
+        if (body.classList.contains('bg-light')) {
+            body.classList.remove('bg-light', 'text-dark');
+            body.classList.add('bg-dark', 'text-light');
+            toggleButton.textContent = '🌙';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            body.classList.remove('bg-dark', 'text-light');
+            body.classList.add('bg-light', 'text-dark');
+            toggleButton.textContent = '☀️';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+</script>
+    {% endblock %}
 </body>
 </html>
