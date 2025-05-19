@@ -1,14 +1,26 @@
 {% extends 'base.html' %}
 
-{% block title %}Buscar Ação{% endblock %}
-
 {% block content %}
 
+<h3> Ações </h3>
 <form method="post">
     {% csrf_token %}
-    <div class="mb-3">
-        <input type="text" name="simbolo" class="form-control" placeholder="Digite o código da ação (ex: AAPL, PETR4.SA)">
+    <div class="d-flex align-items-center">
+      <div class="mb-3 me-2">
+            <input type="text" name="simbolo" class="form-control form-control-sm w-auto" placeholder="(ex: AAPL, PETR4.SA)">
+        </div>
+        <div class="mb-3 me-2">
+        <select name="periodo" class="form-select form-select-sm w-auto">
+        <option value="1d">Diário</option>
+        <option value="5d">Últimos 5 dias</option>
+        <option value="1wk">Semanal</option>
+        <option value="1mo">Mensal</option>
+        <option value="3mo">Trimestral</option>
+        <option value="6mo">Semestral</option>
+        <option value="1y">Anual</option>
+        </select>
     </div>
+</div>
     <button type="submit" class="btn btn-primary">Buscar</button>
 </form>
 
@@ -17,7 +29,8 @@
 {% endif %}
 
 {% if dados_disponiveis %}
-    <h4 class="mt-4">Últimos dados:</h4>
+    <h3 class="mt-4"> {{simbolo}}</h3>
+    <h4 class="mt-2">Últimos dados:</h4>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -45,6 +58,12 @@
 {% endif %}
 
 {% if info_geral %}
+    <h4 class="mt-4">Analise Simplificada:</h4>
+    <ul class="list-group">
+        <li class="list-group-item"><strong>Média do Preço (Fechamento): </strong> {{moeda}} {{ media|floatformat:2}}</li>
+        <li class="list-group-item"><strong>Moda do Preço (Fechamento):</strong> {{moeda}} {{moda|floatformat:2}}</li>
+        <li class="list-group-item"><strong>Mediana do Preço (Fechamento):</strong> {{moeda}} {{mediana|floatformat:2}}</li>
+    </ul>
     <h4 class="mt-4">Informações gerais:</h4>
     <ul class="list-group">
         <li class="list-group-item"><strong>Nome:</strong> {{ info_geral.longName }}</li>
@@ -52,6 +71,7 @@
         <li class="list-group-item"><strong>Indústria:</strong> {{ info_geral.industry }}</li>
         <li class="list-group-item"><strong>CEO:</strong> {{ info_geral.ceo }}</li>
         <li class="list-group-item"><strong>Localização:</strong> {{ info_geral.address1 }}, {{ info_geral.city }}, {{ info_geral.state }}</li>
+        <li class="list-group-item"><strong>Moeda:</strong> {{ info_geral.moeda }} </li>
         <li class="list-group-item"><strong>Website:</strong> <a href="{{ info_geral.website }}" target="_blank">{{ info_geral.website }}</a></li>
         <li class="list-group-item"><strong>Descrição:</strong> {{ info_geral.longBusinessSummary }}</li>
     </ul>
