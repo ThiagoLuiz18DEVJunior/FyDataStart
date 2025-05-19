@@ -30,10 +30,13 @@ class StockView(View):
         dados_acao = None
         dados_disponiveis = False
         info_geral = {}
+        executivos = []
         media = None
         moda = None 
         mediana = None
         moeda= None
+        maior_valor= None
+        menor_valor = None
         simbolo = request.POST.get('simbolo')
         periodo = request.POST.get('periodo', '1d')
         translated_summary = 'Não disponível'
@@ -53,23 +56,34 @@ class StockView(View):
                 moda = dados['Close'].mode()[0]  
                 mediana = dados['Close'].median()  
                 moeda = info_geral.get('currency', 'Desconhecida')
+                maior_valor= dados['Close'].max()
+                menor_valor = dados['Close'].min()
+
+                officers = info_geral.get('companyOfficers', [])
+
+                for officer in officers:
+                    nome = officer.get('name', 'Não disponível')
+                    cargo = officer.get('title', 'Cargo não informado')
+                    executivos.append({'nome': nome, 'cargo': cargo})
+               
 
             else:
                 erro = "Não foi possível encontrar dados para esse símbolo."
 
         except Exception as e:
             erro = f"Ocorreu um erro: {str(e)}"
-
+        
+      
         info_geral_tratada = {
             'longName': info_geral.get('longName', 'Não disponível'),
             'sector': info_geral.get('sector', 'Não disponível'),
             'industry': info_geral.get('industry', 'Não disponível'),
-            'ceo': info_geral.get('ceo', 'Não disponível'),
             'address1': info_geral.get('address1', 'Não disponível'),
             'city': info_geral.get('city', 'Não disponível'),
             'state': info_geral.get('state', 'Não disponível'),
             'website': info_geral.get('website', 'Não disponível'),
             'moeda' : info_geral.get('currency', 'Desconhecida'),
+            'fullTimeEmployees': info_geral.get('fullTimeEmployees', 'Não disponível'),
             'longBusinessSummary': translated_summary,
         }
 
@@ -77,10 +91,14 @@ class StockView(View):
             'dados_acao': dados_acao,
             'dados_disponiveis': dados_disponiveis,
             'erro': erro,
+            'periodo': periodo,
             'info_geral': info_geral_tratada,
+            'executivos': executivos,
             'media': media,
             'moda': moda,
             'mediana': mediana,
             'moeda': moeda,
             'simbolo': simbolo,
+            'maior_valor': maior_valor,
+            'menor_valor': menor_valor,
         })
