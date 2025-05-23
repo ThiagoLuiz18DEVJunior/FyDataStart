@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-center p-1"> FyDataStart </h1>
+ <h3 class="text-center p-2"> Ações em Alta </h3>
+
+    <table cellpadding="5" cellspacing="0">
+        <tbody>
+            {% for row in dados_setores %}
+
+                <tr>
+                    {% for company in row %}
+                        <td style="vertical-align: top; width: 300px; text-align: center;">
+                             <a href="{% url 'Home' %}"><strong>{{ company.symbol }}</strong></a>
+                            </br>{{ company.name }}
+                            <div style="text-align: center; margin-right: 20px;">
+                                {{ company.grafico_html|safe }}
+                            </div>
+                             Rating: {{ company.rating }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
