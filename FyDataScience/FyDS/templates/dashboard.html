@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Campo de busca de ação -->
+   <div class="d-flex flex-nowrap align-items-center p-2">
+      <div class="form-group me-2">
+        <label for="simbolo">Buscar Ação:</label>
+        <input type="text" class="form-control" name="simbolo" id="simbolo"
+              placeholder="Ex: PETR4.SA" required>
+      </div>
+
+      <!-- Período -->
+      <div class="form-group me-2">
+        <label for="periodo">Período:</label>
+        <select class="form-select" name="periodo" id="periodo" required>
+          <option value="1mo">Mensal</option>
+          <option value="2mo">Bimestral</option>
+          <option value="3mo">Trimestral</option>
+          <option value="6mo">Semestral</option>
+          <option value="1y">Anual</option>
+        </select>
+      </div>
+
+      <!-- Modelos -->
+      <div class="form-group">
+        <label>Modelos:</label><br>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="modelos" value="AR" id="modelAR">
+          <label class="form-check-label" for="modelAR">AR</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="modelos" value="MA" id="modelMA">
+          <label class="form-check-label" for="modelMA">MA</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="modelos" value="ARMA" id="modelARMA">
+          <label class="form-check-label" for="modelARMA">ARMA</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="modelos" value="ARIMA" id="modelARIMA">
+          <label class="form-check-label" for="modelARIMA">ARIMA</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="modelos" value="SARIMA" id="modelSARIMA">
+          <label class="form-check-label" for="modelSARIMA">SARIMA</label>
+        </div>
+      </div>
+      </div>
+
+      <!-- Botão de submissão -->
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Buscar e Rodar Modelos</button>
+      </div>
+
+      <!-- Mensagem de aviso -->
+      <div class="form-group w-100">
+        <p>⚠️ Quanto mais modelos selecionados, maior o tempo de compilação!</p>
+      </div>
+    </form>
+    {% if erro %}
+      <div class="alert alert-danger mt-3">{{ erro }}</div>
+    {% endif %}
+{% endblock %}

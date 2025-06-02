@@ -1,26 +1,60 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="text-center p-1"> FyDataStart </h1>
- <h3 class="text-center p-2"> Ações em Alta </h3>
+<div class="container">
+    <h1 class="text-center py-3">FyDataStart</h1>
+    <h3 class="text-center pb-3">Ações em Alta</h3>
 
-    <table cellpadding="5" cellspacing="0">
-        <tbody>
-            {% for row in dados_setores %}
+    <form method="get" class="row justify-content-center mb-4">
+        <div class="col-md-2">
+            <label for="setor">Setor:</label>
+            <select name="setor" id="setor" class="form-select">
+                <option value="technology" {% if setor_selecionado == 'technology' %}selected{% endif %}>Tecnologia</option>
+                <option value="healthcare" {% if setor_selecionado == 'healthcare' %}selected{% endif %}>Saúde</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="periodo">Período:</label>
+            <select name="periodo" id="periodo" class="form-select">
+                <option value="1wk" {% if periodo_selecionado == '1wk' %}selected{% endif %}>1 Semana</option>
+                <option value="1mo" {% if periodo_selecionado == '1mo' %}selected{% endif %}>1 Mês</option>
+                <option value="2mo" {% if periodo_selecionado == '2mo' %}selected{% endif %}>2 Meses</option>
+                <option value="3mo" {% if periodo_selecionado == '3mo' %}selected{% endif %}>3 Meses</option>
+                <option value="6mo" {% if periodo_selecionado == '6mo' %}selected{% endif %}>6 Meses</option>
+                <option value="1y" {% if periodo_selecionado == '1y' %}selected{% endif %}>1 Ano</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="moeda">Moeda:</label>
+            <select name="moeda" id="moeda" class="form-select">
+                <option value="USD" {% if moeda_selecionada == 'USD' %}selected{% endif %}>Dólar (US$)</option>
+            </select>
+        </div>
+        <div class="col-md-2 align-self-end">
+            <button type="submit" class="btn btn-primary w-100">Atualizar</button>
+        </div>
+    </form>
 
-                <tr>
-                    {% for company in row %}
-                        <td style="vertical-align: top; width: 300px; text-align: center;">
-                             <a href="{% url 'Home' %}"><strong>{{ company.symbol }}</strong></a>
-                            </br>{{ company.name }}
-                            <div style="text-align: center; margin-right: 20px;">
-                                {{ company.grafico_html|safe }}
-                            </div>
-                             Rating: {{ company.rating }}
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table>
+            <tbody>
+                {% for row in dados_setores %}
+                    <tr>
+                        {% for company in row %}
+                            <td style="vertical-align: top; width: 50%;">
+                                <div class="card mb-4">
+                                    <div class="card-body text-center">
+                                        <h5><strong>{{ company.symbol }}</strong></h5>
+                                        <p>{{ company.name }}</p>
+                                        <div>{{ company.grafico_html|safe }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

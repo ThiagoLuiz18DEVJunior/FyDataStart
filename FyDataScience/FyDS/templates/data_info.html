@@ -5,11 +5,11 @@
 <h3> Ações </h3>
 <form method="post">
     {% csrf_token %}
-    <div class="d-flex align-items-center">
+<div class="d-flex align-items-center">
       <div class="mb-3 me-2">
             <input type="text" name="simbolo" class="form-control form-control-sm w-auto" placeholder="(ex: AAPL, PETR4.SA)">
         </div>
-        <div class="mb-3 me-2">
+    <div class="mb-3 me-2">
         <select name="periodo" class="form-select form-select-sm w-auto">
         <option value="1d">Diário</option>
         <option value="5d">Últimos 5 dias</option>

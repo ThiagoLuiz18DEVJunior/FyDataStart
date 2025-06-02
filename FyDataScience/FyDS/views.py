@@ -9,72 +9,95 @@ import yfinance as yf
 import plotly.io as pio
 import plotly.graph_objs as go
 
-
 # Criando Modelos CBV(Class-Based-View)
 class HomePage(View):
     def get(self, request, *args, **kwargs):
-        tech = yf.Sector('healthcare')
-        df = tech.top_companies.head(6).reset_index()
-        df.rename(columns={'index': 'symbol'}, inplace=True)
+        setor = request.GET.get('setor', 'technology')
+        periodo = request.GET.get('periodo', '1wk')
+        moeda = request.GET.get('moeda', 'US$')
+        dados = []
+        dados_setores = []
 
-        dados = df.to_dict(orient='records')
+        try:
+            sector_data = yf.Sector(setor)
+            df = sector_data.top_companies
 
-        for empresa in dados:
-            symbol = empresa['symbol']
-            ticker = yf.Ticker(symbol)
-            hist = ticker.history(period='1mo')
+            if isinstance(df, pd.DataFrame) and not df.empty:
+                df = df.head(6)
+                df = df.reset_index()
+                if 'index' in df.columns:
+                    df.rename(columns={'index': 'symbol'}, inplace=True)
 
-            if hist.empty:
-                empresa['grafico_html'] = "<p>Sem dados</p>"
-                continue
+                dados = df.to_dict(orient='records')
 
-            ymin = min(hist['Open'].min(), hist['Close'].min())
-            ymax = max(hist['Open'].max(), hist['Close'].max())
+                for empresa in dados:
+                    symbol = empresa.get('symbol')
+                    if not symbol:
+                        continue
 
-            fig = go.Figure()
+                    ticker = yf.Ticker(symbol)
+                    hist = ticker.history(period=periodo)
 
-            # Linha de Abertura
-            fig.add_trace(go.Scatter(
-                x=hist.index,
-                y=hist['Open'],
-                mode='lines+markers',
-                name='Abertura',
-                line=dict(color='orange'),
-                hovertemplate='Data: %{x}<br>Abertura: R$ %{y:.2f}<extra></extra>'
-            ))
+                    if hist.empty:
+                        empresa['grafico_html'] = "<p>Sem dados</p>"
+                        continue
 
-            # Linha de Fechamento
-            fig.add_trace(go.Scatter(
-                x=hist.index,
-                y=hist['Close'],
-                mode='lines+markers',
-                name='Fechamento',
-                line=dict(color='royalblue'),
-                hovertemplate='Data: %{x}<br>Fechamento: R$ %{y:.2f}<extra></extra>'
-            ))
+                    ymin = min(hist['Open'].min(), hist['Close'].min())
+                    ymax = max(hist['Open'].max(), hist['Close'].max())
 
-            fig.update_layout(
-                height=300,
-                width=525,
-                margin=dict(l=20, r=20, t=30, b=30),
-                xaxis_title='Data',
-                yaxis_title='Preço',
-                template='plotly_white',
-                showlegend=True,
-                yaxis=dict(
-                    range=[ymin * 0.98, ymax * 1.02],  # margem de 2%
-                    tickprefix="R$ ",
-                    tickformat=".2f"
-                )
-            )
+                    fig = go.Figure()
 
-            empresa['grafico_html'] = pio.to_html(fig, full_html=False, include_plotlyjs=False)
+                    fig.add_trace(go.Scatter(
+                        x=hist.index,
+                        y=hist['Open'],
+                        mode='lines+markers',
+                        name='Abertura',
+                        line=dict(color='orange'),
+                        hovertemplate=f'Data: %{{x}}<br>Abertura: {"R$" if moeda == "BRL" else "US$"} %{{y:.2f}}<extra></extra>'
+                    ))
 
-        # Organiza em uma matriz 3x2 (6 elementos -> 3 linhas de 2)
+                    fig.add_trace(go.Scatter(
+                        x=hist.index,
+                        y=hist['Close'],
+                        mode='lines+markers',
+                        name='Fechamento',
+                        line=dict(color='royalblue'),
+                        hovertemplate=f'Data: %{{x}}<br>Fechamento: {"R$" if moeda == "BRL" else "US$"} %{{y:.2f}}<extra></extra>'
+                    ))
+
+                    fig.update_layout(
+                        height=300,
+                        width=500,
+                        margin=dict(l=20, r=20, t=30, b=30),
+                        xaxis_title='Data',
+                        yaxis_title='Preço',
+                        template='plotly_white',
+                        showlegend=True,
+                        yaxis=dict(
+                            range=[ymin * 0.98, ymax * 1.02],
+                            tickprefix="R$ " if moeda == "BRL" else "US$ ",
+                            tickformat=".2f"
+                        )
+                    )
+
+                    empresa['grafico_html'] = pio.to_html(fig, full_html=False, include_plotlyjs=False)
+            else:
+                dados = []
+
+        except Exception as e:
+            print(f"[ERRO] Falha ao carregar setor '{setor}': {e}")
+            dados = []
+
         dados_setores = [dados[i:i + 2] for i in range(0, len(dados), 2)]
 
-        return render(request, 'home.html', {'dados_setores': dados_setores})
+        contexto = {
+            'dados_setores': dados_setores,
+            'setor_selecionado': setor,
+            'periodo_selecionado': periodo,
+            'moeda_selecionada': moeda,
+        }
 
+        return render(request, 'home.html', contexto)
 
 class StockView(View):
     template_name = 'data_info.html'
@@ -165,3 +188,28 @@ class StockView(View):
             'maior_valor': maior_valor,
             'menor_valor': menor_valor,
         })
+
+class DashView(View):
+    def get(self, request, *args, **kwargs):
+        # Lógica para DashView
+        return render(request, 'dashboard.html')
+
+class NerdView(View):
+    def get(self, request, *args, **kwargs):
+        # Lógica para NerdView
+        return render(request, 'nerd.html')
+
+class InfoView(View):
+    def get(self, request, *args, **kwargs):
+        # Lógica para InfoView
+        return render(request, 'info.html')
+
+class DocView(View):
+    def get(self, request, *args, **kwargs):
+        # Lógica para DocView
+        return render(request, 'document.html')
+
+class DevsView(View):
+    def get(self, request, *args, **kwargs):
+        # Lógica para DevsView
+        return render(request, 'dev.html')
