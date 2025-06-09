@@ -49,9 +49,8 @@
       </div>
       </div>
 
-      <!-- Botão de submissão -->
-      <div class="form-group">
-        <button type="submit" class="btn btn-primary">Buscar e Rodar Modelos</button>
+      <div class="form-group p-2">
+        <button type="submit" class="btn btn-primary">Rodar Modelos</button>
       </div>
 
       <!-- Mensagem de aviso -->
@@ -61,5 +60,22 @@
     </form>
     {% if erro %}
       <div class="alert alert-danger mt-3">{{ erro }}</div>
+    {% endif %}
+
+        
+     {% if graficos %}
+      {% for grafico in graficos %}
+        <div style="width: 100%; height: 500px; margin-bottom: 3rem;">
+          {{ grafico|safe }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if graficos_acf %}
+      {% for grafico_acf in graficos_acf %}
+        <div style="width: 100%; height: 500px;  margin-bottom: 3rem;">
+          {{ grafico_acf|safe }}
+        </div>
+      {% endfor %}
     {% endif %}
 {% endblock %}

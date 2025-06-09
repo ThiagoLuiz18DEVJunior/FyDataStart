@@ -2,12 +2,20 @@ from django.shortcuts import render
 from .templates import *
 from django.views.generic import *
 from deep_translator import GoogleTranslator
+from statsmodels.tsa.ar_model import AutoReg
 import numpy as np
 import pandas as pd
+from scipy.stats import linregress
 from plotly import plot
 import yfinance as yf
 import plotly.io as pio
 import plotly.graph_objs as go
+from scipy.stats import pearsonr
+from statsmodels.tsa.stattools import acf
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tsa.stattools import acf
+from scipy.stats import pearsonr, shapiro
 
 # Criando Modelos CBV(Class-Based-View)
 class HomePage(View):
@@ -190,15 +198,140 @@ class StockView(View):
         })
 
 class DashView(View):
-    def get(self, request, *args, **kwargs):
-        # Lógica para DashView
+    def get(self, request):
         return render(request, 'dashboard.html')
 
-class NerdView(View):
-    def get(self, request, *args, **kwargs):
-        # Lógica para NerdView
-        return render(request, 'nerd.html')
+    def post(self, request):
+        simbolo = request.POST.get('simbolo')
+        periodo = request.POST.get('periodo')
+        modelos_selecionados = request.POST.getlist('modelos')  
 
+        context = {}
+
+        try:
+            dados = yf.Ticker(simbolo).history(period=periodo)
+            if dados.empty:
+                raise ValueError("Nenhum dado encontrado para o símbolo informado.")
+
+            fechamento = dados['Close']
+
+            graficos = []
+            graficos_acf = []
+
+            for modelo_nome in modelos_selecionados:
+                if modelo_nome == 'AR':
+                    fig, fig_acf = self.rodar_modelo_ar(fechamento, simbolo, periodo)
+                elif modelo_nome == 'MA':
+                    fig, fig_acf = self.rodar_modelo_ma(fechamento, simbolo, periodo)
+                elif modelo_nome == 'ARMA':
+                    fig, fig_acf = self.rodar_modelo_arma(fechamento, simbolo, periodo)
+                elif modelo_nome == 'ARIMA':
+                    fig, fig_acf = self.rodar_modelo_arima(fechamento, simbolo, periodo)
+                elif modelo_nome == 'SARIMA':
+                    fig, fig_acf = self.rodar_modelo_sarima(fechamento, simbolo, periodo)
+                else:
+                    continue
+
+                graficos.append(fig.to_html(full_html=False))
+                graficos_acf.append(fig_acf.to_html(full_html=False))
+
+            context['graficos'] = graficos
+            context['graficos_acf'] = graficos_acf
+
+        except Exception as e:
+            context['erro'] = str(e)
+
+        return render(request, 'dashboard.html', context)
+
+    # Exemplo do método rodar_modelo_ar:
+    def rodar_modelo_ar(self, fechamento, simbolo, periodo):
+        lag = 6
+        modelo = AutoReg(fechamento, lags=lag).fit()
+        start = lag
+        end = len(fechamento) - 1
+        previsao = modelo.predict(start=start, end=end, dynamic=False)
+        fechamento_slice = fechamento[start:end + 1]
+        
+
+        # Gráfico (exemplo simplificado)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=fechamento_slice.index, y=fechamento_slice, mode='lines', name='Fechamento Real'))
+        fig.add_trace(go.Scatter(x=previsao.index, y=previsao, mode='lines', name='Previsão AR'))
+
+        fig.update_layout(title=f'AR - {simbolo} ({periodo})', xaxis_title='Data', yaxis_title='Preço')
+
+        # ACF
+        acf_vals = acf(fechamento, nlags=20)
+        fig_acf = go.Figure(go.Bar(x=list(range(len(acf_vals))), y=acf_vals))
+        fig_acf.update_layout(title='Autocorrelação (ACF)', xaxis_title='Lag', yaxis_title='ACF')
+
+        return fig, fig_acf
+
+    def rodar_modelo_ma(self, fechamento, simbolo, periodo):
+        # MA(1) como exemplo, ordem (0,0,1)
+        modelo = ARIMA(fechamento, order=(0, 0, 1)).fit()
+        start = 1  # para MA(1), a previsão começa do índice 1
+        end = len(fechamento) - 1
+        previsao = modelo.predict(start=start, end=end, dynamic=False)
+        fechamento_slice = fechamento[start:end + 1]
+
+        return self._criar_graficos(fechamento_slice, previsao, simbolo, periodo, 'MA')
+
+    def rodar_modelo_arma(self, fechamento, simbolo, periodo):
+        # ARMA(1,1) exemplo, ordem (1,0,1)
+        modelo = ARIMA(fechamento, order=(1, 0, 1)).fit()
+        lag = max(1, 1)  # maior entre AR e MA lag
+        start = lag
+        end = len(fechamento) - 1
+        previsao = modelo.predict(start=start, end=end, dynamic=False)
+        fechamento_slice = fechamento[start:end + 1]
+
+        return self._criar_graficos(fechamento_slice, previsao, simbolo, periodo, 'ARMA')
+
+    def rodar_modelo_arima(self, fechamento, simbolo, periodo):
+        # ARIMA(1,1,1) exemplo — 1 diferença para estacionarizar
+        modelo = ARIMA(fechamento, order=(1, 1, 1)).fit()
+        lag = 1  # AR lag
+        start = lag
+        end = len(fechamento) - 1
+        previsao = modelo.predict(start=start, end=end, dynamic=False)
+        fechamento_slice = fechamento[start:end + 1]
+
+        return self._criar_graficos(fechamento_slice, previsao, simbolo, periodo, 'ARIMA')
+
+    def rodar_modelo_sarima(self, fechamento, simbolo, periodo):
+        # SARIMA(1,1,1)(1,1,1,12) exemplo com sazonalidade 12
+        modelo = SARIMAX(fechamento, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12)).fit()
+        lag = 1  # considerar o AR lag
+        start = lag
+        end = len(fechamento) - 1
+        previsao = modelo.predict(start=start, end=end, dynamic=False)
+        fechamento_slice = fechamento[start:end + 1]
+
+        return self._criar_graficos(fechamento_slice, previsao, simbolo, periodo, 'SARIMA')
+
+    def _criar_graficos(self, fechamento_slice, previsao, simbolo, periodo, modelo_nome):
+        # Gráfico dos valores reais e previstos
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=fechamento_slice.index, y=fechamento_slice,
+                                 mode='lines', name='Fechamento Real'))
+        fig.add_trace(go.Scatter(x=previsao.index, y=previsao,
+                                 mode='lines', name=f'Previsão {modelo_nome}', line=dict(dash='dot')))
+
+        fig.update_layout(title=f'{modelo_nome} - {simbolo} ({periodo})',
+                          xaxis_title='Data',
+                          yaxis_title='Preço de Fechamento',
+                          template='plotly_white')
+
+        # Gráfico de ACF
+        acf_vals = acf(fechamento_slice, nlags=20)
+        fig_acf = go.Figure(go.Bar(x=list(range(len(acf_vals))), y=acf_vals))
+        fig_acf.update_layout(title=f'Autocorrelação (ACF) - {modelo_nome}',
+                              xaxis_title='Lag',
+                              yaxis_title='ACF',
+                              template='plotly_white')
+
+        return fig, fig_acf
 class InfoView(View):
     def get(self, request, *args, **kwargs):
         # Lógica para InfoView
