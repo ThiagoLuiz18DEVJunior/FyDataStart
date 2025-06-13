@@ -8,10 +8,13 @@
     <form method="get" class="row justify-content-center mb-4">
         <div class="col-md-2">
             <label for="setor">Setor:</label>
-            <select name="setor" id="setor" class="form-select">
-                <option value="technology" {% if setor_selecionado == 'technology' %}selected{% endif %}>Tecnologia</option>
-                <option value="healthcare" {% if setor_selecionado == 'healthcare' %}selected{% endif %}>Saúde</option>
-            </select>
+        <select name="setor" id="setor" class="form-select">
+            <option value="technology" {% if setor_selecionado == 'technology' %}selected{% endif %}>Tecnologia</option>
+            <option value="energy" {% if setor_selecionado == 'energy' %}selected{% endif %}>Energia</option>
+            <option value="healthcare" {% if setor_selecionado == 'healthcare' %}selected{% endif %}>Saúde</option>
+            <option value="industrials" {% if setor_selecionado == 'industrials' %}selected{% endif %}>Industriais</option>
+            <option value="utilities" {% if setor_selecionado == 'utilities' %}selected{% endif %}>Utilidades Públicas</option>
+        </select>
         </div>
         <div class="col-md-2">
             <label for="periodo">Período:</label>
