@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
-<body id="theme-body" class="bg-light text-dark">
+<body id="theme-body" class="bg-light text-dark backgrou">
     <div class="d-flex">
         <nav id="theme-body" class="shadow-lg" style="width: 200px; min-height: 100vh;">
             <div class="p-3 position-fixed">
@@ -33,13 +33,17 @@
             <div>
                 <p class="bi bi-mortarboard-fill"> Essa Plataforma é Somente de Cunho Educacional!</p>
                 <main class="container">
-                    {% block content %}
+                   {% block hero %}
                     {% endblock %}
+                    <div id="dynamic-content">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
                 </main>
             </div>
             <div>
                 <footer style="flex-shrink: 0; text-align: center; padding: 1rem 0;">
-                    <div class="container">
+                    <div class="container mt-5">
                     <p>&copy; 2025 - FyDataStart - TCC Project</p>
                     <small>Desenvolvido por Thiago Luiz</small>
                     </div>
@@ -74,6 +78,16 @@
             toggleButton.textContent = '☀️';
             localStorage.setItem('theme', 'light');
         }
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const dynamicContent = document.getElementById("dynamic-content");
+      const hero = document.getElementById("hero");
+
+      if (hero && dynamicContent && dynamicContent.innerText.trim().length > 100) {
+        hero.classList.add("hidden");
+      }
     });
 </script>
     {% endblock %}
