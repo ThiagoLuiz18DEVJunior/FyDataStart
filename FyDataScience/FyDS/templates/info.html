@@ -1,4 +1,66 @@
 {% extends 'base.html' %}
+{% block title %}Manual de Usuário | FyDataStart{% endblock %}
 
 {% block content %}
+<div class="container mt-4 p-3 shadow-lg rounded">
+    <h2 class="mb-4 p-3"><i class="bi bi-info-circle"></i> Manual de Usuário</h2>
+
+    <div class="accordion" id="manualAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingIntro">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIntro" aria-expanded="true" aria-controls="collapseIntro">
+                    Introdução
+                </button>
+            </h2>
+            <div id="collapseIntro" class="accordion-collapse collapse show" aria-labelledby="headingIntro" data-bs-parent="#manualAccordion">
+                <div class="accordion-body">
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingAplicabilidade">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAplicabilidade" aria-expanded="false" aria-controls="collapseAplicabilidade">
+                    Aplicabilidade
+                </button>
+            </h2>
+            <div id="collapseAplicabilidade" class="accordion-collapse collapse" aria-labelledby="headingAplicabilidade" data-bs-parent="#manualAccordion">
+                <div class="accordion-body">
+                    <p>A plataforma é ideal para:</p>
+                    <ul>
+                       
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingModelos">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModelos" aria-expanded="false" aria-controls="collapseModelos">
+                    Modelos
+                </button>
+            </h2>
+            <div id="collapseModelos" class="accordion-collapse collapse" aria-labelledby="headingModelos" data-bs-parent="#manualAccordion">
+                <div class="accordion-body">
+                    <p>Modelos disponíveis na plataforma:</p>
+                    <ul>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingDownload">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDownload" aria-expanded="false" aria-controls="collapseDownload">
+                    Baixar Dados
+                </button>
+            </h2>
+            <div id="collapseDownload" class="accordion-collapse collapse" aria-labelledby="headingDownload" data-bs-parent="#manualAccordion">
+                <div class="accordion-body mb-3">
+                    <ul>
+                    </ul>
+                    <p>Para isso, utilize os botões "Exportar" disponíveis nos dashboards.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
