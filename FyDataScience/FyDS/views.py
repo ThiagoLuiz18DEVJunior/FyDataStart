@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from .templates import *
 from django.views.generic import *
-from deep_translator import GoogleTranslator
 from statsmodels.tsa.ar_model import AutoReg
 import numpy as np
 import pandas as pd
