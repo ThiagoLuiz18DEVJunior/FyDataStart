@@ -322,12 +322,13 @@ class DashView(View):
         return fig_linha, fig_acf, fig_hist, fig_scatter
 
     def rodar_modelo_sarima(self, fechamento, simbolo, periodo):
-        modelo = SARIMAX(fechamento, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12)).fit()
+        modelo = SARIMAX(fechamento, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12), enforce_stationarity=False, enforce_invertibility=False).fit()
         lag = 1
         start = lag
         end = len(fechamento) - 1
         previsao = modelo.predict(start=start, end=end, dynamic=False)
         fechamento_slice = fechamento[start:end + 1]
+        print(modelo.mle_retvals)
 
         residuos = fechamento_slice - previsao
 
