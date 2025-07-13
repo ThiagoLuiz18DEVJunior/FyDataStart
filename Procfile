@@ -1,1 +1,1 @@
-web: gunicorn FyDataStart.wsgi
+web: gunicorn FyDataScience.wsgi
