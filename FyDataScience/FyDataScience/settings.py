@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-93tz*5k%@jmpux417ulj2yal1dqafv77)$r+&7wet%08ib3d=+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['fydatastart-production.up.railway.app/Stock', 'fydatastart-production.up.railway.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['fydatastart-production.up.railway.app', 'localhost', '127.0.0.1']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
