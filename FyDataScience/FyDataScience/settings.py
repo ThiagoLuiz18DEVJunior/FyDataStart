@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-93tz*5k%@jmpux417ulj2yal1dqafv77)$r+&7wet%08ib3d=+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['www.fydatastart.com.br', 'fydatastart-production.up.railway.app', 'localhost', '127.0.0.1']
 
